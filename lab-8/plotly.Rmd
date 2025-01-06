@@ -1,0 +1,226 @@
+---
+title: "Plotly & Shiny"
+author: "Pradip Basnet"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+
+```{r}
+#install.packages("hexbin")
+library(hexbin)
+library(plotly)
+library(ggplot2)
+
+data(diamonds, package="ggplot2")
+```
+
+The code initializes an interactive plot with diamond cut quality on the x-axis
+```{r}
+plot_ly(diamonds,x=~cut)
+```
+
+The code creates an interactive plot mapping the quality of diamond cuts (cut) on the x-axis and the clarity levels (clarity) on the y-axis.
+The heatmap shows how often each combination of diamond cut and clarity occurs in the dataset. The most frequent combinations are highlighted by the brightest colors, with the "Ideal" cut and "VS2" clarity being the most common. The heatmap effectively highlights the distribution of diamonds across different quality levels in terms of both cut and clarity.
+```{r}
+plot_ly(diamonds,x=~cut,y=~clarity)
+```
+# Intro to ggplotly
+
+The hexbin plot is used to represent the density of data points. Each hexagon's color intensity indicates the number of diamonds within that hexagon's range
+The hexbin plot reveals a strong positive correlation between the logarithms of carat weight and price for diamonds. Most diamonds in the dataset have a moderate size and price, forming a dense cluster in the middle of the plot. The log-log scale helps to linearize the data, showing a consistent trend where larger diamonds are more expensive, as expected
+```{r}
+p <- ggplot(diamonds,aes(x=log(carat),y=log(price)))+
+  geom_hex(bins=100)
+ggplotly(p)
+```
+
+geom_freqpoly() This function adds a frequency polygon layer to the plot. A frequency polygon is similar to a histogram but uses lines instead of bars to show the distribution of a continuous variable. It connects the points representing the frequency of observations in each.The plot will show a frequency polygon for each clarity category, with each line representing the distribution of diamond prices for that specific clarity level bin
+```{r}
+p <- ggplot(diamonds,aes(x=log(price),color=clarity))+
+  geom_freqpoly()
+ggplotly(p)
+```
+
+
+```{r}
+p <- ggplot(diamonds, aes(x = log(price), color = clarity)) +
+geom_freqpoly(stat = "density") +
+facet_wrap(~cut)
+ggplotly(p)
+```
+
+# Shiny
+
+loading the library shiny
+```{r}
+library(shiny)
+#runExample("01_hello")
+```
+
+This Shiny UI code creates a simple web application with a sidebar slider that lets the user select the number of observations for a random distribution. The chosen number of observations is then used to generate and display a plot in the main panel. The interface includes a title at the top, a slider on the side, and a plot area in the main section of the application
+```{r}
+# Define UI for application that plots random distributions
+shinyUI(pageWithSidebar(
+ # Application title
+ headerPanel("Hello Shiny!"),
+ # Sidebar with a slider input for number of observations
+ sidebarPanel(
+ sliderInput("obs",
+ "Number of observations:",
+ min = 1,
+ max = 50,
+ value = 30)
+ ),
+ # Show a plot of the generated distribution
+ mainPanel(
+ plotOutput("distPlot")
+ )
+))
+```
+
+The server code in this Shiny application generates a random distribution of data based on the number of observations specified by the user through the slider input. The renderPlot function ensures that the plot is reactive, meaning it will automatically update whenever the user changes the slider value for the number of observations.
+```{r}
+# Define server logic required to generate and plot a random distribution
+shinyServer(function(input, output) {
+ # Expression that generates a plot of the distribution. The expression
+ # is wrapped in a call to renderPlot to indicate that:
+ #
+ # 1) It is "reactive" and therefore should be automatically
+ # re-executed when inputs change
+ # 2) Its output type is a plot
+ #
+ output$distPlot <- renderPlot({
+ # generate a random distribution and plot it
+ dist <- rnorm(input$obs)
+ hist(dist)
+ })
+})
+```
+
+This code sets up the basic structure for a Shiny application titled "Miles Per Gallon." It includes a title at the top, an empty sidebar for user inputs, and an empty main panel for displaying outputs.
+```{r}
+# Define UI for miles per gallon application
+shinyUI(pageWithSidebar(
+ # Application title
+ headerPanel("Miles Per Gallon"),
+ sidebarPanel(),
+ mainPanel()
+))
+```
+
+This code sets up the structure for the server logic of a Shiny application
+```{r}
+shinyServer(function(input, output) {
+})
+```
+
+
+## Adding Inputs to the Sidebar
+
+This code sets up the user interface (UI) for a Shiny web application, The UI is set up to allow easy exploration 
+```{r}
+# Define the names of the columns in the mpg dataset
+data(mpg, package = "ggplot2")
+nms <- names(mpg)
+
+# Define the UI
+shinyUI(pageWithSidebar(
+  
+  headerPanel("Miles Per Gallon"),
+  
+  sidebarPanel(
+    selectInput('x', 'X', choices = nms, selected = "displ"),
+    selectInput('y', 'Y', choices = nms, selected = "hwy")
+  ),
+  
+  mainPanel(
+    plotOutput("mpgPlot")
+  )
+))
+
+```
+
+## Creating the Server Script
+
+This code defines the server logic for a Shiny application
+```{r}
+data(mpg, package = "ggplot2")
+shinyServer(function(input, output) {
+
+ output$mpgPlot <- renderPlot({
+ ggplot(mpg, aes_string(x=input$x, y=input$y)) + geom_point()
+ })
+})
+```
+
+
+
+## Embedding plotly in Shiny
+
+This Shiny UI code creates an interface, he selected variables are chosen via dropdown menus in the sidebar, and the resulting plot is displayed in the main panel using plotly, allowing for interactive exploration of the data.
+```{r}
+data(mpg, package = "ggplot2")
+nms <- names(mpg)
+shinyUI(pageWithSidebar(
+ headerPanel("Miles Per Gallon"),
+ sidebarPanel(
+ selectInput('x', 'X', choices = nms, selected = "displ"),
+ selectInput('y', 'Y', choices = nms, selected = "hwy")
+ ),
+ mainPanel(
+ plotlyOutput("mpgPlot")
+ )
+))
+```
+
+
+```{r}
+data(mpg, package = "ggplot2")
+shinyServer(function(input, output) {
+
+ output$mpgPlot <- renderPlotly({
+ p<- ggplot(mpg, aes_string(x=input$x, y=input$y)) + geom_point()
+ ggplotly(p)
+ })
+})
+```
+
+
+
+```{r}
+data(mpg, package = "ggplot2")
+nms <- c("cty","hwy")
+shinyUI(pageWithSidebar(
+ headerPanel("Miles Per Gallon"),
+ sidebarPanel(
+ selectInput('x', 'X', choices = nms, selected = "cty"),
+ sliderInput("bw",
+ "bin width:",
+ min = 1,
+ max = 10,
+ value = 3)
+
+ ),
+ mainPanel(
+ plotlyOutput("mpgPlot")
+ )
+))
+```
+
+This code defines the server-side logic for a Shiny web application 
+```{r}
+data(mpg, package = "ggplot2")
+shinyServer(function(input, output) {
+
+ output$mpgPlot <- renderPlotly({
+ p<- ggplot(mpg, aes_string(input$x)) + geom_histogram(binwidth = input$bw)
+ ggplotly(p)
+ })
+})
+```
+

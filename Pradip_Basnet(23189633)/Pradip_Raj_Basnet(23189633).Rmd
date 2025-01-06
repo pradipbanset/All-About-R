@@ -1,0 +1,51 @@
+---
+title: "R Notebook"
+author: "Pradip Basnet"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+
+```{r}
+library(ggplot2)
+library(readr)
+```
+
+
+## the graph shows the price of different diamonds based on the carat and cut of the diamonds, it can be clearly seen that the price highly depends on the carat of the diamonds higher the carat higher the price. 
+
+```{r}
+ggplot(diamonds,aes(x=carat,y=price,colour = cut)) +
+  geom_point() +
+  facet_grid(color~cut) +
+  labs(title = "Scatterplot", x="Carat",y="Price") +
+  theme_minimal()
+```
+
+```{r}
+patient.data.cleaned
+```
+
+
+```{r}
+df <- patient.data.cleaned
+df
+```
+
+## the below scatterplot demonstrates the relationship between the BMI and Weight of the male and female based on the factor smoker or non-smoker,a glance at graph reveals that female has small height whether they are smoker or non smoker where as male has similar kind of height in both the cases, taller than female. 
+
+```{r}
+ggplot(df,aes(x=BMI,y=Weight,color=Height)) +
+  geom_point() +
+  facet_grid(Sex~Smokes)
+```
+## the boxplot reveals that the female smoke less than the average man do, it also reveals that the male at the age of 44 smokes more than any age where as women at the age 43 smoke least.
+```{r}
+ggplot(df,aes(x=Smokes,y=BMI,fill = Sex)) +
+  geom_boxplot(color="black") +
+  facet_grid(~Age)
+```
+

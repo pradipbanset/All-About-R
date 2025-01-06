@@ -1,0 +1,19 @@
+---
+title: "lab 1"
+author: "Bibek Sapkota"
+output: pdf_document
+---
+
+Task 1: installing and loading the package
+```{r}
+#install.packages("ggplot2")
+library("ggplot2")
+```
+
+Task 2: Createing a stacked bar plot showing the count of diamonds by clarity, with bars filled by cut quality.
+```{r}
+depth_dist <- ggplot(diamonds,aes(clarity))
+depth_dist+geom_bar(aes(fill=cut),position="stack")
+```
+
+

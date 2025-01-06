@@ -1,0 +1,124 @@
+---
+title: "data visualization (faceting qplot)"
+author: "Pradip Basnet"
+output: pdf_document
+---
+
+task 1: visualize the distribution of highway miles per gallon (hwy) across different types of drive systems (drv) in the mpg dataset. By creating a grid of histograms faceted by drv
+generate a grid of histograms where each row corresponds to a different drive type (drv), and each histogram within a row shows the distribution of highway miles per gallon (hwy) for cars of that drive type
+
+```{r}
+qplot(hwy,data = mpg,facets = drv~.,binwidth=2)
+```
+task 2:generate a grid of scatter plots where each row corresponds to a different drive type (drv), and each scatter plot within a row shows the relationship between engine displacement (displ) and highway miles per gallon (hwy) for cars of that drive type
+
+```{r}
+qplot(displ,hwy,data = mpg,facets = .~drv)
+```
+task 3: adding smoother in the above code here each plot includes individual data points and a smoothed trend line, helping to visualize both the specific data distribution and the overall trend
+
+```{r}
+qplot(displ,hwy,data = mpg,facets = .~drv,geom = c("point","smooth"))
+```
+task 4:generate a grid of histograms where each row corresponds to a different color grade (color), and each histogram within a row shows the distribution of diamond weights (carat) for diamonds of that color grade. This visual representation helps in comparing weight distributions across different color grades
+
+```{r}
+qplot(carat,data = diamonds,facets = color~.,geom = "histogram")
+```
+task 5:..density.. specifies that the y-axis should represent the density of the data rather than the count
+generates a grid of histograms where the y-axis represents density rather than count. Each histogram shows the density distribution of diamond weights (carat) for diamonds categorized by their color grade 
+
+```{r}
+qplot(carat, ..density.., data = diamonds, facets = color ~ ., geom = "histogram")
+```
+task 6:faceted histogram shows the detailed comparison of how diamond weight distributions vary by both color and cut, reveals the trends in diamond weights across different colors and cuts.
+
+```{r}
+qplot(carat, data = diamonds, facets = color ~ cut, geom = "histogram")
+```
+
+#Exercise
+##1. Adjust axis limits of last 3 plots to make them clearer
+
+###1
+
+Specifies the x-axis variable and creates a histogram. Facets the grid by diamond color and cut. Adjusts the x-axis with a label, limits, and tick marks. Enhances clarity by adjusting the size of axis text, and the size and boldness of axis titles and facet labels.
+
+```{r}
+library(ggplot2)
+
+qplot(carat, data = diamonds, geom = "histogram", facets = color ~ cut, binwidth = 0.1) +
+  scale_x_continuous(name = "Carat", limits = c(0, 3), breaks = seq(0, 3, by = 0.5)) +
+  scale_y_continuous(name = "Count", breaks = seq(0, 3000, by = 500)) +
+  theme(
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+
+```
+###2
+
+Adjustments were made to the x-axis by labeling it "Carat," setting limits from zero to three carats, and adding breaks at regular intervals. The y-axis was labeled "Density," with limits set to ensure density visibility and breaks at regular intervals. The theme was adjusted to improve readability by setting the axis text size appropriately for both axes, and making the axis titles and facet labels bold and clear
+
+```{r}
+library(ggplot2)
+
+qplot(carat, ..density.., data = diamonds, geom = "histogram", facets = color ~ ., binwidth = 0.1) +
+  scale_x_continuous(name = "Carat", limits = c(0, 3), breaks = seq(0, 3, by = 0.5)) +
+  scale_y_continuous(name = "Density", limits = c(0, 0.3), breaks = seq(0, 0.6, by = 0.1)) +
+  theme(
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+
+```
+
+##3
+
+To enhance the visibility of density in the histogram plot using qplot, adjust the x-axis to label "Carat" with limits set from 0 to 5 carats and breaks at every 0.5 carats. For the y-axis labeled "Density," ensure breaks are set at every 200 units. Improve clarity with axis text size set to 10 for both axes, and emphasize axis titles in size 12 and bold. Facet labels are also set to size 12 and bold for clear identification across diamond color and cu
+
+```{r}
+library(ggplot2)
+
+qplot(carat, data = diamonds, facets = color ~ cut, geom = "histogram", binwidth = 0.1) +
+  scale_x_continuous(name = "Carat", limits = c(0, 5), breaks = seq(0, 5, by = 1)) +
+  scale_y_continuous(name = "Density", breaks = seq(0, 1000, by = 500)) +
+  theme(
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    axis.title.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 12, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+
+```
+##Interpretation:
+show the relationship between engine size and highway fuel economy for each cylinder. Here are four separate charts, each representing a different number of cylinders (4, 5, 6, and 8).Generally, there is a negative trend within each chart. This means that as the engine displacement increases (moving to the right on the x-axis), the highway fuel economy tends to decrease (moving down on the y-axis).Cars with bigger engines tend to be less fuel-efficient on highways compared to cars with smaller engines.
+
+```{r}
+qplot(displ, hwy, data = mpg, facets = factor(cyl) ~.)
+```
+
+##Interpretation:
+In the 1999 scatter plot, there is a negative correlation between 'displ' and 'hwy', as the value of 'hwy' decreases as 'displ' increases. This is indicated by a downward trend in the scatter plot. The 2008 scatter plot also shows a negative correlation, but with a less steep slope compared to the 1999 plot.The shaded areas around the fitted curves represent the confidence intervals. The confidence intervals in the 2008 plot appear to be wider, suggesting greater variability in the data for that year
+
+```{r}
+qplot(displ, hwy, data=mpg, facets = . ~ year) + geom_smooth()
+```
+##Interpretation:
+added a smoother to the individual panels divided by faceting without showing the point.a negative correlation can be observed for the 4 aqnd 6 and a slight positive corellation in 8
+
+```{r}
+qplot(displ, hwy, data = mpg, facets = factor(cyl) ~., geom="smooth")
+```
+doing the same with showing the points
+```{r}
+qplot(displ, hwy, data = mpg, facets = factor(cyl) ~., geom=c("point","smooth"))
+```
+

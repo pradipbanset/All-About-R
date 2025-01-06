@@ -1,0 +1,76 @@
+---
+title: "data visualization (smoothing qplot)"
+author: "Pradip Basnet"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+#Add a Smoother
+
+```{r}
+data("diamonds")
+```
+
+
+tas 1:create a smaller dataset from diaminds by randomly sample. create a reproducible random sample of 100 rows from the diamonds dataset
+```{r}
+set.seed(1000)
+dsmall <- diamonds[sample(nrow(diamonds),100),]
+```
+
+
+task 2:visualize the relationship between the logarithmically transformed carat weight (log(carat)) and logarithmically transformed price (log(price)) of diamonds in the dsmall dataset using a scatter plot with a smoothed trend line
+```{r}
+qplot(log(carat),log(price),data=dsmall,geom = "smooth")
+```
+task 3:combine multiple geoms using the c() function, visualize the relationship between the logarithmically transformed carat weight (log(carat)) and logarithmically transformed price (log(price)) of diamonds in the dsmall dataset using a scatter plot with individual points and a smoothed trend line
+```{r}
+qplot(log(carat),log(price),data = dsmall,geom = c("point","smooth"))
+```
+task 4:visualize the relationship between the logarithmically transformed carat weight (log(carat)) and logarithmically transformed price (log(price)) of diamonds in the dsmall dataset using a scatter plot with individual points and a more sensitive smoothed trend line. 
+```{r}
+qplot(log(carat),log(price),data = dsmall,geom = c("smooth","point"),span=0.2)
+```
+task 5:Setting span = 1 in this context will create a very smooth trend line that reflects the general relationship between log(carat) and log(price) in the dsmall dataset
+```{r}
+qplot(log(carat),log(price),data = dsmall,geom = c("smooth","point"),span=1)
+```
+installing and loading the necessary package
+```{r}
+#install.packages("splines")
+library("splines")
+```
+
+##fit a linear model instead by using method = “lm” or robust linear model “rlm” which is less sensitive to outlier
+
+task 6:visualize the relationship between the logarithmically transformed carat weight (log(carat)) and logarithmically transformed price (log(price)) of diamonds in the dsmall dataset using a scatter plot with individual points and a linear regression trend line
+```{r}
+qplot(log(carat), log(price), data = dsmall, geom = c("point", "smooth"), method = "lm")
+```
+task 7: visualize the relationship between engine displacement (displ) and highway miles per gallon (hwy) for cars in the mpg dataset using scatterplot
+```{r}
+qplot(displ,hwy,data = mpg)
+```
+
+task 7: generate a scatter plot where the color of each point is determined by the drv variable
+```{r}
+qplot(displ, hwy, data = mpg, colour = drv)
+```
+
+task 8:visualize the relationship between engine displacement (displ) and highway miles per gallon (hwy) for cars in the mpg dataset using a scatter plot with individual points and a smoothed trend line
+```{r}
+qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
+```
+##How are engine size and fuel economy related?
+
+task 9:visualize the relationship between engine displacement (displ) and highway miles per gallon (hwy) for cars in the mpg dataset, with points colored according to the number of cylinders
+```{r}
+qplot(displ,hwy,data = mpg,colour=factor(cyl))
+```
+task 10:visualize the relationship between engine displacement (displ) and highway miles per gallon (hwy) for cars in the mpg dataset. It creates a scatter plot with both individual data points and a linear regression trend line, where each point is colored according to the number of cylinders
+```{r}
+qplot(displ,hwy,data = mpg,colour=factor(cyl),geom = c("smooth","point"),method="lm")
+```
+
